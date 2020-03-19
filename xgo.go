@@ -39,8 +39,8 @@ func init() {
 }
 
 // Cross compilation docker containers
-var dockerBase = "karalabe/xgo-base"
-var dockerDist = "karalabe/xgo-"
+var dockerBase = "andyshi/xgo-base"
+var dockerDist = "andyshi/xgo-"
 
 // Command line arguments to fine tune the compilation
 var (
@@ -54,6 +54,8 @@ var (
 	crossArgs   = flag.String("depsargs", "", "CGO dependency configure arguments")
 	targets     = flag.String("targets", "*/*", "Comma separated targets to build for")
 	dockerImage = flag.String("image", "", "Use custom docker image instead of official distribution")
+	goPrivate   = flag.String("go-private", "", "Set custom goprivate env for your private dependencies")
+	githubToken = flag.String("github-token", "", "Provide github token to access private github repository dependency. This must be set given `go-private` is provided")
 )
 
 // ConfigFlags is a simple set of flags to define the environment and dependencies.
@@ -66,6 +68,8 @@ type ConfigFlags struct {
 	Dependencies string   // CGO dependencies (configure/make based archives)
 	Arguments    string   // CGO dependency configure arguments
 	Targets      []string // Targets to build for
+	GoPrivate    string   // GoPrivate to modify goprivate environment
+	GithubToken  string   // GithubToken to access private dependencies
 }
 
 // Command line arguments to pass to go build
@@ -93,6 +97,7 @@ func main() {
 	flag.Parse()
 
 	xgoInXgo := os.Getenv("XGO_IN_XGO") == "1"
+	log.Printf("xgoinxgo: %v\n", xgoInXgo)
 	if xgoInXgo {
 		depsCache = "/deps-cache"
 	}
@@ -162,6 +167,11 @@ func main() {
 			}
 		}
 	}
+	if len(*goPrivate) > 0 {
+		if len(*githubToken) < 1 {
+			log.Fatalf("--github-token is not provided")
+		}
+	}
 	// Assemble the cross compilation environment and build options
 	config := &ConfigFlags{
 		Repository:   flag.Args()[0],
@@ -172,6 +182,8 @@ func main() {
 		Dependencies: *crossDeps,
 		Arguments:    *crossArgs,
 		Targets:      strings.Split(*targets, ","),
+		GoPrivate:    *goPrivate,
+		GithubToken:  *githubToken,
 	}
 	flags := &BuildFlags{
 		Verbose: *buildVerbose,
@@ -298,6 +310,8 @@ func compile(image string, config *ConfigFlags, flags *BuildFlags, folder string
 		"-e", fmt.Sprintf("FLAG_LDFLAGS=%s", flags.LdFlags),
 		"-e", fmt.Sprintf("FLAG_BUILDMODE=%s", flags.Mode),
 		"-e", "TARGETS=" + strings.Replace(strings.Join(config.Targets, " "), "*", ".", -1),
+		"-e", fmt.Sprintf("GO_PRIVATE=%s", config.GoPrivate),
+		"-e", fmt.Sprintf("GITHUB_TOKEN=%s", config.GithubToken),
 	}
 	for i := 0; i < len(locals); i++ {
 		args = append(args, []string{"-v", fmt.Sprintf("%s:%s:ro", locals[i], mounts[i])}...)
@@ -305,6 +319,7 @@ func compile(image string, config *ConfigFlags, flags *BuildFlags, folder string
 	args = append(args, []string{"-e", "EXT_GOPATH=" + strings.Join(paths, ":")}...)
 
 	args = append(args, []string{image, config.Repository}...)
+
 	return run(exec.Command("docker", args...))
 }
 
@@ -333,6 +348,7 @@ func compileContained(config *ConfigFlags, flags *BuildFlags, folder string) err
 		fmt.Sprintf("FLAG_LDFLAGS=%s", flags.LdFlags),
 		fmt.Sprintf("FLAG_BUILDMODE=%s", flags.Mode),
 		"TARGETS=" + strings.Replace(strings.Join(config.Targets, " "), "*", ".", -1),
+		"-e", fmt.Sprintf("GO_PRIVATE=%s", config.GoPrivate),
 	}
 	if local {
 		env = append(env, "EXT_GOPATH=/non-existent-path-to-signal-local-build")
@@ -342,7 +358,6 @@ func compileContained(config *ConfigFlags, flags *BuildFlags, folder string) err
 
 	cmd := exec.Command("/build.sh", config.Repository)
 	cmd.Env = append(os.Environ(), env...)
-
 	return run(cmd)
 }
 

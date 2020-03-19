@@ -22,6 +22,8 @@
 #   TARGETS        - Comma separated list of build targets to compile for
 #   GO_VERSION     - Bootstrapped version of Go to disable uncupported targets
 #   EXT_GOPATH     - GOPATH elements mounted from the host filesystem
+#   GO_PRIVATE     - Optional variable to override the private repository source
+#   GITHUB_TOKEN   - Must be provided if overriding GO_PRIVATE 
 
 # Define a function that figures out the binary extension
 function extension {
@@ -46,13 +48,19 @@ function extension {
   fi
 }
 
+echo "GOPRIVATE: $GO_PRIVATE"
+
+if [ "$GO_PRIVATE" != "" ]; then
+  git config --global url."https://github:$GITHUB_TOKEN@github.com".insteadOf "https://github.com"
+  echo "setting GO_PRIVATE env to $GO_PRIVATE..."
+  export GO_PRIVATE=$GO_PRIVATE
+fi
+
 # Either set a local build environemnt, or pull any remote imports
 if [ "$EXT_GOPATH" != "" ]; then
   # If local builds are requested, inject the sources
-  echo "Building locally $1..."
   export GOPATH=$GOPATH:$EXT_GOPATH
   set -e
-
   # Find and change into the package folder
   cd `go list -e -f {{.Dir}} $1`
   export GOPATH=$GOPATH:`pwd`/Godeps/_workspace
@@ -113,6 +121,7 @@ else
     fi
   fi
 fi
+
 
 # Download all the C dependencies
 mkdir /deps
