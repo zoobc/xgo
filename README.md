@@ -63,23 +63,20 @@ Simply specify the import path you want to build, and xgo will do the rest:
     -rwxr-xr-x  1 root  root    7516368 Nov 24 16:44 iris-windows-4.0-386.exe
     -rwxr-xr-x  1 root  root    9549416 Nov 24 16:44 iris-windows-4.0-amd64.exe
 
-
 If the path is not a canonical import path, but rather a local path (starts with
 a dot `.` or a dash `/`), xgo will use the local GOPATH contents for the cross
 compilation.
-
 
 ### Build flags
 
 A handful of flags can be passed to `go build`. The currently supported ones are
 
-  - `-v`: prints the names of packages as they are compiled
-  - `-x`: prints the build commands as compilation progresses
-  - `-race`: enables data race detection (supported only on amd64, rest built without)
-  - `-tags='tag list'`: list of build tags to consider satisfied during the build
-  - `-ldflags='flag list'`: arguments to pass on each go tool link invocation
-  - `-buildmode=mode`: binary type to produce by the compiler
-
+- `-v`: prints the names of packages as they are compiled
+- `-x`: prints the build commands as compilation progresses
+- `-race`: enables data race detection (supported only on amd64, rest built without)
+- `-tags='tag list'`: list of build tags to consider satisfied during the build
+- `-ldflags='flag list'`: arguments to pass on each go tool link invocation
+- `-buildmode=mode`: binary type to produce by the compiler
 
 ### Go releases
 
@@ -95,10 +92,10 @@ be retrieved and installed.
 
 Additionally, a few wildcard release strings are also supported:
 
-  - `latest` will use the latest Go release (this is the default)
-  - `1.6.x` will use the latest point release of a specific Go version
-  - `1.6-develop` will use the develop branch of a specific Go version
-  - `develop` will use the develop branch of the entire Go repository
+- `latest` will use the latest Go release (this is the default)
+- `1.6.x` will use the latest point release of a specific Go version
+- `1.6-develop` will use the develop branch of a specific Go version
+- `develop` will use the develop branch of the entire Go repository
 
 ### Output prefixing
 
@@ -118,7 +115,6 @@ file prefix. This can be overridden with the `-out` flag.
     -rwxr-xr-x  1 root  root  10040464 Nov 24 16:44 iris-v0.3.2-linux-arm
     -rwxr-xr-x  1 root  root   7516368 Nov 24 16:44 iris-v0.3.2-windows-4.0-386.exe
     -rwxr-xr-x  1 root  root   9549416 Nov 24 16:44 iris-v0.3.2-windows-4.0-amd64.exe
-
 
 ### Branch selection
 
@@ -140,7 +136,6 @@ the desired branch name through the `--branch` argument.
     -rwxr-xr-x  1 root  root   4348416 Nov 24 16:40 goimports-windows-4.0-386.exe
     -rwxr-xr-x  1 root  root   5415424 Nov 24 16:40 goimports-windows-4.0-amd64.exe
 
-
 ### Remote selection
 
 Yet again similarly to `go get`, xgo uses the repository remote corresponding to
@@ -152,12 +147,12 @@ original import path, use the `--remote` argument.
 
 ### Package selection
 
-If you used the above *branch* or *remote* selection machanisms, it may happen
+If you used the above _branch_ or _remote_ selection machanisms, it may happen
 that the path you are trying to build is only present in the specific branch and
 not the default repository, causing Go to fail at locating it. To circumvent this,
 you may specify only the repository root for xgo, and use an additional `--pkg`
-parameter to select the exact package within, honoring any prior *branch* and
-*remote* selections.
+parameter to select the exact package within, honoring any prior _branch_ and
+_remote_ selections.
 
     $ xgo --pkg cmd/goimports golang.org/x/tools
     ...
@@ -184,15 +179,15 @@ architectures supported by the underlying Go runtime. If you wish to restrict
 the build to only a few target systems, use the comma separated `--targets` CLI
 argument:
 
-  * `--targets=linux/arm`: builds only the ARMv5 Linux binaries (`arm-6`/`arm-7` allowed)
-  * `--targets=windows/*,darwin/*`: builds all Windows and OSX binaries
-  * `--targets=*/arm`: builds ARM binaries for all platforms
-  * `--targets=*/*`: builds all suppoted targets (default)
+- `--targets=linux/arm`: builds only the ARMv5 Linux binaries (`arm-6`/`arm-7` allowed)
+- `--targets=windows/*,darwin/*`: builds all Windows and OSX binaries
+- `--targets=*/arm`: builds ARM binaries for all platforms
+- `--targets=*/*`: builds all suppoted targets (default)
 
 The supported targets are:
 
- * Platforms: `android`, `darwin`, `ios`, `linux`, `windows`
- * Achitectures: `386`, `amd64`, `arm-5`, `arm-6`, `arm-7`, `arm64`, `mips`, `mipsle`, `mips64`, `mips64le`
+- Platforms: `android`, `darwin`, `ios`, `linux`, `windows`
+- Achitectures: `386`, `amd64`, `arm-5`, `arm-6`, `arm-7`, `arm64`, `mips`, `mipsle`, `mips64`, `mips64le`
 
 ### Platform versions
 
@@ -202,17 +197,17 @@ versions of the same operating system. This however can lead to issues if a used
 dependency is only supported by more recent systems. As such, `xgo` supports the
 selection of specific platform versions by appending them to the OS target string.
 
- * `--targets=ios-8.1/*`: cross compile to iOS 8.1
- * `--targets=android-16/*`: cross compile to Android Jelly Bean
- * `--targets=darwin-10.9/*`: cross compile to Mac OS X Mavericks
- * `--targets=windows-6.0/*`: cross compile to Windows Vista
+- `--targets=ios-8.1/*`: cross compile to iOS 8.1
+- `--targets=android-16/*`: cross compile to Android Jelly Bean
+- `--targets=darwin-10.9/*`: cross compile to Mac OS X Mavericks
+- `--targets=windows-6.0/*`: cross compile to Windows Vista
 
 The supported platforms are:
 
- * All Android APIs up to Android Lollipop 5.0 ([API level ids](https://source.android.com/source/build-numbers.html))
- * All Windows APIs up to Windows 8.1 limited by `mingw-w64` ([API level ids](https://en.wikipedia.org/wiki/Windows_NT#Releases))
- * OSX APIs in the range of 10.6 - 10.11
- * All iOS APIs up to iOS 9.3
+- All Android APIs up to Android Lollipop 5.0 ([API level ids](https://source.android.com/source/build-numbers.html))
+- All Windows APIs up to Windows 8.1 limited by `mingw-w64` ([API level ids](https://en.wikipedia.org/wiki/Windows_NT#Releases))
+- OSX APIs in the range of 10.6 - 10.11
+- All iOS APIs up to iOS 9.3
 
 ### Mobile libraries
 
@@ -226,15 +221,15 @@ supported by the requested Android platform version. For iOS frameworks `xgo`
 will bundle armv7 and arm64 by default, and also the x86_64 simulator builds
 if the iPhoneSimulator.sdk was injected by the user:
 
-* Create a new docker image based on xgo: `FROM karalabe/xgo-latest`
-* Inject the simulator SDK: `ADD iPhoneSimulator9.3.sdk.tar.xz /iPhoneSimulator9.3.sdk.tar.xz`
-* Bootstrap the simulator SDK: `$UPDATE_IOS /iPhoneSimulator9.3.sdk.tar.xz`
+- Create a new docker image based on xgo: `FROM karalabe/xgo-latest`
+- Inject the simulator SDK: `ADD iPhoneSimulator9.3.sdk.tar.xz /iPhoneSimulator9.3.sdk.tar.xz`
+- Bootstrap the simulator SDK: `$UPDATE_IOS /iPhoneSimulator9.3.sdk.tar.xz`
 
 ### CGO dependencies
 
 The main differentiator of xgo versus other cross compilers is support for basic
 embedded C/C++ code and target-platform specific OS SDK availability. The current
-xgo release introduces an experimental CGO *dependency* cross compilation, enabling
+xgo release introduces an experimental CGO _dependency_ cross compilation, enabling
 building Go programs that require external C/C++ libraries.
 
 It is assumed that the dependent C/C++ library is `configure/make` based, was
@@ -270,3 +265,23 @@ Some trivial arguments may be passed to the dependencies' configure script via
 
 Note, that since xgo needs to cross compile the dependencies for each platform
 and architecture separately, build time can increase significantly.
+
+### Private Dependency
+
+If your project depends on private repository add the following flag:
+
+- `--github-token=your-token-here --go-private=github.com/yourOrg/*`
+
+`--github-token` is required when we want to set `--go-private`
+
+### Build on local
+
+- build `xgo-base` dockerfile.
+
+`cd docker/base/ && docker build -t zoobc/xgo-base .`
+
+- install go and bootstrap required dependencies
+
+`cd docker/go-.1.14.0 && docker build -t zoobc/xgo-latest .`
+
+- run `go install` on this project root directory
